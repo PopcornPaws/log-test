@@ -1,25 +1,31 @@
+use env_logger::Env;
 use log::{error, warn, info, debug, trace};
 use log::LevelFilter;
 
+use std::env;
+
 fn main() {
+	init_logger();
+	trace!("this is a trace message");
+	debug!("this is a debug message");
+	info!("this is an info message");
+	warn!("this is a warn message");
+	error!("this is an error message");
 }
 
-/*
-use crate::logger::*;
-static LOGGER: SimpleLogger = SimpleLogger;
-
 #[cfg(all(feature = "production", feature = "SGX_MODE_HW"))]
-#[ctor]
 fn init_logger() {
-    log::set_logger(&LOGGER).unwrap(); // It's ok to panic at this stage. This shouldn't happen though
+	let env = Env::default().filter_or("LOG_LEVEL", LevelFilter::Warn);
+	env_logger::init_from_env();
     set_log_level_or_default(LevelFilter::Error, LevelFilter::Warn);
 }
 
 #[cfg(all(not(feature = "production"), not(feature = "test")))]
-#[ctor]
 fn init_logger() {
-    log::set_logger(&LOGGER).unwrap(); // It's ok to panic at this stage. This shouldn't happen though
+	println!("before = {}", log::max_level());
+	env_logger::init_from_env();
     set_log_level_or_default(LevelFilter::Trace, LevelFilter::Trace);
+	println!("before = {}", log::max_level());
 }
 
 fn log_level_from_str(env_log_level: &str) -> Option<LevelFilter> {
@@ -45,17 +51,17 @@ fn set_log_level_or_default(default: LevelFilter, max_level: LevelFilter) {
     let mut log_level = default;
 
     if let Some(env_log_level) =
-        log_level_from_str(&env::var(consts::LOG_LEVEL_ENV_VAR).unwrap_or_default())
+        log_level_from_str(&env::var("LOG_LEVEL").unwrap_or_default())
     {
         // We want to make sure log level is not higher than WARN in production to prevent accidental secret leakage
         if env_log_level <= max_level {
             log_level = env_log_level;
         }
     }
-
     log::set_max_level(log_level);
 }
 
+/*
 #[cfg(feature = "test")]
 pub mod logging_tests {
     use crate::{count_failures, set_log_level_or_default};

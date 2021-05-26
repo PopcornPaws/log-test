@@ -4,5 +4,10 @@ version = "0.1.0"
 authors = ["Mark Melczer <melczer7@gmail.com>"]
 edition = "2018"
 
+[features]
+SGX_MODE_HW = []
+production = ["SGX_MODE_HW", "log/max_level_warn", "log/release_max_level_warn"]
+
 [dependencies]
+env_logger = "0.8.3"
 log = "0.4.14"
