@@ -1,5 +1,9 @@
-FROM rust
+FROM rust:1.43
 
-COPY log-test /bin/log-test
+WORKDIR /usr/src/log-test
 
-CMD = ["/bin/log-test"]
+COPY . .
+
+RUN cargo install --path .
+
+CMD = ["log-test"]
